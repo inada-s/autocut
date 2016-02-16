@@ -1,5 +1,23 @@
 # autocut
 
+autocut は 長時間録画したゲームの動画を, いい感じに1ゲームごとにカットするスクリプトです.
+
+環境構築後、`python autocut.py preset foo-bar.mp4` で実行できます.
+
+preset はディレクトリで, サンプルとして、`zdx`と`sf4`が入っています.
+
+`start.png` に近いフレームを探し, その後 `end.png` に近いフレームが見つかったら, その区間を ffmpeg を使って無圧縮カットします.
+
+config.txtはテキストファイルで, 以下の様なフォーマットをしています.
+```
+[offset]
+start=-3
+end=5
+```
+これは, start.png に似たフレームから3秒前をカット開始位置に設定し, end.png に似たフレームから5秒後をカット終了位置に設定するという意味です.
+
+カットしたい動画のゲームや画質に合わせて、start.png, end.png, config.txt を設定してください. 
+
 ## Windows環境構築メモ 
 1.python2.7.11のインストール
 - https://www.python.org/downloads/
