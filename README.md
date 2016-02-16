@@ -4,7 +4,7 @@ autocut は 長時間録画したゲームの動画を, いい感じに1ゲー�
 
 環境構築後、`python autocut.py preset foo-bar.mp4` で実行できます.
 
-preset はディレクトリで, サンプルとして、`zdx`と`sf4`が入っています.
+preset はディレクトリで, サンプルとして, `zdx`と`sf4`が入っています.
 
 `start.png` に近いフレームを探し, その後 `end.png` に近いフレームが見つかったら, その区間を ffmpeg を使って無圧縮カットします.
 
@@ -55,7 +55,7 @@ Finished processing dependencies for numpy==1.10.4
 ```
 import cv2 [enter]
 ```
-- と入力して何もエラーがでなければOK
+と入力して何もエラーがでなければOK
 
 5.ffmpegの入手
 - http://ffmpeg.zeranoe.com/builds/
