@@ -13,8 +13,21 @@ config.txtはテキストファイルで, 以下の様なフォーマットを�
 [offset]
 start=-3
 end=5
+
+[thratio]
+start=0.60
+end=0.60
+
+[option]
+behind_start=1
+
 ```
-これは, start.png に似たフレームから3秒前をカット開始位置に設定し, end.png に似たフレームから5秒後をカット終了位置に設定するという意味です.
+これは, 
+- start.png に60%くらい似たフレームから3秒前をカット開始位置に設定する
+- end.png に60%くらい似たフレームから5秒後をカット終了位置に設定する
+- start.png に似たフレームが複数回出てきた場合、後に出てきた位置を採用する
+
+という意味です.
 
 カットしたい動画のゲームや画質に合わせて、start.png, end.png, config.txt を設定してください. 
 
@@ -60,3 +73,15 @@ import cv2 [enter]
 5.ffmpegの入手
 - http://ffmpeg.zeranoe.com/builds/
 - から `ffmpeg-xxxxx-xxxxx-win64-static` をダウンロードして7zを解凍し、中にある `bin/ffmpeg.exe` をコピーしておいておく
+
+## 使い方 Windows
+1.このリポジトリをダウンロードして解凍する.
+- https://github.com/inada-s/autocut/archive/master.zip
+
+2.解凍したディレクトリに準備でダウンロードしておいた, ffmpeg.exeを配置する
+
+3.コマンドプロンプトを開き, 解凍したディレクトリを開く
+
+4.実行する
+`autocut.py zdx2 path/to/file.mp4`
+- file_001.mp4, file_002.mp4 などというファイル名でカットされた動画が出力される.
