@@ -2,3 +2,10 @@
 start=-1
 end=5
 
+[thratio]
+start=0.70
+end=0.70
+
+[option]
+behind_start=0
+

@@ -43,9 +43,15 @@ class VideoLoader():
 
     def curpos(self):
         return int(self.cap.get(cv2.cv.CV_CAP_PROP_POS_FRAMES))
-        
+
     def seek_frame(self, num):
-        self.cap.set(cv2.cv.CV_CAP_PROP_POS_FRAMES, min(self.curpos() + num, self.frame_count))
+        result = True
+        frame = self.curpos() + num
+        if frame > self.frame_count:
+            frame = self.frame_count
+            result = False
+        self.cap.set(cv2.cv.CV_CAP_PROP_POS_FRAMES, frame)
+        return result
 
     def available(self):
         return self.cap.isOpened()
@@ -68,6 +74,7 @@ class SubProcessCut():
     def run(self, begin_sec, length_sec, output_file_name):
         self.command = [
             'ffmpeg',
+            '-y',
             '-ss', str(begin_sec),
             '-i', self.file_path,
             '-t', str(length_sec),
@@ -76,7 +83,8 @@ class SubProcessCut():
             output_file_name
         ]
         print "popen", self.command
-        self.p = subprocess.Popen(self.command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        with open("stderr.log", "wb") as logfile:
+            self.p = subprocess.Popen(self.command, stdout=subprocess.PIPE, stderr=logfile, shell=False)
 
     def wait(self):
         if self.p:
@@ -87,6 +95,8 @@ def main():
     preset = sys.argv[1]
     movie_file = sys.argv[2]
     preset_path = os.path.join(script_path, preset)
+    print "preset:", preset
+    print "movie:", movie_file
 
     conf = ConfigParser.SafeConfigParser()
     conf.read(os.path.join(preset_path, 'config.txt'))
@@ -95,6 +105,13 @@ def main():
     video = VideoLoader(movie_file)
     start = TemplateImage(os.path.join(preset_path, 'start.png'))
     end = TemplateImage(os.path.join(preset_path, 'end.png'))
+    start_th = float(conf.get('thratio', 'start'))
+    end_th = float(conf.get('thratio', 'end'))
+    behind_start = int(conf.get('option', 'behind_start'))
+
+    if not video.available():
+        print "video load error"
+        return
 
     between = False
     section_list = []
@@ -104,37 +121,53 @@ def main():
 
     cutman = None
     number = 1
+
+    #cv2.namedWindow("image", cv2.WINDOW_NORMAL)
     while(video.available()):
-        video.seek_frame(video.fps)
         ret, frame = video.next()
+
         if not ret:
             break
-
         gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
-        if not between:
+        if behind_start or not between:
             rect, max_value = start.match(gray)
-            if max_value >= 0.70:
+            print "s", max_value,
+            if max_value >= start_th:
                 section_start = video.curpos() + video.fps * start_offset
+                print "section start", video.curpos(), section_start
+                #cv2.imshow("image", frame)
+                if section_start < 0:
+                    section_start = 0
                 between = True
-        else:
+
+        if between:
             rect, max_value = end.match(gray)
-            if max_value >= 0.70:
+            print "e", max_value,
+            if max_value >= end_th:
+                print "section end"
                 section_end = video.curpos() + video.fps * end_offset
+                if section_end > video.frame_count:
+                    section_end = video.frame_count
                 section_list.append((section_start, section_end))
                 base_name, ext = os.path.splitext(movie_file)
                 cutman = SubProcessCut(movie_file)
-                cutman.run( section_start / video.fps,
-                            (section_end - section_start) / video.fps,
+                cutman.run( float(section_start) / video.fps,
+                            float(section_end - section_start) / video.fps,
                             base_name + '_%03d' % number + ext)
                 number += 1
                 section_start, section_end = 0, 0
                 print "section_list", section_list
                 between = False
         bar.update(float(video.curpos()) / video.frame_count)
+        if not video.seek_frame(video.fps):
+            break
+        #cv2.waitKey(1)
     if cutman:
         cutman.wait()
         print "waiting cut process..."
+    #cv2.destroyAllWindows()
+
 
 if __name__ == '__main__':
     main()
