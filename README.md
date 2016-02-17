@@ -73,3 +73,15 @@ import cv2 [enter]
 5.ffmpegの入手
 - http://ffmpeg.zeranoe.com/builds/
 - から `ffmpeg-xxxxx-xxxxx-win64-static` をダウンロードして7zを解凍し、中にある `bin/ffmpeg.exe` をコピーしておいておく
+
+## 使い方 Windows
+1.このリポジトリをダウンロードして解凍する.
+- https://github.com/inada-s/autocut/archive/master.zip
+
+2.解凍したディレクトリに準備でダウンロードしておいた, ffmpeg.exeを配置する
+
+3.コマンドプロンプトを開き, 解凍したディレクトリを開く
+
+4.実行する
+`autocut.py zdx2 path/to/file.mp4`
+- file_001.mp4, file_002.mp4 などというファイル名でカットされた動画が出力される.
