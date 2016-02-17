@@ -1,18 +1,33 @@
 # coding: UTF-8
-
 import os
 import subprocess
+from datetime import datetime
+import sys
 
 def main():
+    os.chdir(os.path.dirname(os.sys.argv[0]))
+    print os.getcwd()
     movie_list = os.sys.argv[1:]
+    print movie_list
+    for i in xrange(len(movie_list)):
+        movie_list[i] = os.path.abspath(movie_list[i])
+    with open("concat_tmp.txt", "w") as f:
+        for movie in movie_list:
+            print >>f, r"file '%s'" % movie
+    datename = datetime.now().strftime("%Y%m%d-%H%M%S")
+    name, ext = os.path.splitext(movie_list[0])
     command = [
-        'ffmpeg', '-i',
-        r'concat:"' + '|'.join(movie_list) + r'"',
-        '-c:v', 'copy',
-        '-c:a', 'copy',
-        'concat_' + movie_list[0]
+        'ffmpeg',
+        '-f', 'concat',
+        '-i', 'concat_tmp.txt',
+        '-codec', 'copy',
+        os.path.join(os.path.dirname(movie_list[0]), "concat_" + datename + ext)
     ]
-    p = subprocess.call(' '.join(command), shell=True)
+    print command
+    with open("concat.log", "wb") as logfile:
+        p = subprocess.call(' '.join(command), stderr=logfile)
+    print "Press Enter Key To Exit."
+    raw_input()
 
 if __name__ == '__main__':
     main()
