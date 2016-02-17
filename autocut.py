@@ -90,14 +90,7 @@ class SubProcessCut():
         if self.p:
             self.p.wait()
 
-def main():
-    script_path = os.path.dirname(sys.argv[0])
-    preset = sys.argv[1]
-    movie_file = sys.argv[2]
-    preset_path = os.path.join(script_path, preset)
-    print "preset:", preset
-    print "movie:", movie_file
-
+def main(preset_path, movie_file):
     conf = ConfigParser.SafeConfigParser()
     conf.read(os.path.join(preset_path, 'config.txt'))
     start_offset = int(conf.get('offset', 'start'))
@@ -111,6 +104,7 @@ def main():
 
     if not video.available():
         print "video load error"
+        raw_input()
         return
 
     between = False
@@ -170,5 +164,8 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    script_path = os.path.dirname(sys.argv[0])
+    preset_path = os.path.join(script_path, sys.argv[1])
+    movie_file = os.path.abspath(sys.argv[2])
+    main(preset_path, movie_file)
 
